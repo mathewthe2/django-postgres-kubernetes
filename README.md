@@ -45,25 +45,51 @@ $ minikube service web
 ### Check dashboard
 `$ minikube dashboard`
 
-## Task 2: Upgrading a Django app with PostgresDB
+## Task 2: Canary Deployment of a Django app with PostgresDB
 
 ### Setup
 ### Clone repo
 `$ git clone https://github.com/mathewthe2/django-postgres-kubernetes.git`
 
-## Build docker image for Django app
+### Setup
+Build docker image for Django app
+
 `$ docker build -t django-postgres:1.0.0 .`
 
-### Create PostgresDB
+Create PostgresDB
+
 `$ k apply -f deploy/kubernetes/postgres/`
 
-### Create Django App
+Create Django App
+
 `$ k apply -f deploy/kubernetes/django/`
 
-## Confirm everything works
+Confirm everything works
+
+`$ minikube service django-service`
+
 `$ minikube dashboard`
 
-minikube service django-service
+### Build new version
+Edit urls.py to redirect homepage to green template.
+`vim kubernetes_django/urls.py`
+
+Build docker image
+`docker build -t django-postgres:1.0.1 .`
+
+Copy deployment file.
+`$ cp deploy/kubernetes/django/deployment.yaml deploy/kubernetes/django/deployment-v2.yaml`
+
+Edit both deployment files. 
+
+Original file
+- update replica size to 3
+
+New deployment file
+- new name: deployment_1.0.1
+- keep replica size to 1
+
+k apply -f delpoy/kubernetes/django
 
 ## Reference
 https://github.com/gitumarkk/kubernetes_django
